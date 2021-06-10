@@ -1,0 +1,59 @@
+body {
+    font-family: sans-serif;
+}
+select {
+    width: 8em;
+    height: 30em;
+}
+/** option styles **/
+option {
+    font-family: monospace;
+}
+#idLeft > option {
+    background-color: #f9f2f4;
+    color: #c7254e;
+}
+#idRight > option {
+    background-color: #f2f9f2;
+    color: #369536;
+}
+.soften > option {
+    transition-delay: 10s;
+    transition: 10s ease-in;
+}
+/** button styles **/
+.leftRightButton {
+    height: 2em;
+    width: 4.5em;
+    margin-right: 4px;
+}
+.upDownButtonSize {
+    height: 1.65em;
+    width: 1.65em;
+}
+.upLeftMargin {
+    margin-left: 4px;
+}
+.upDownOuter {
+    display: inline-block;
+    position: relative;
+}
+.upDownInner:before {
+    position: absolute;
+    content: "";
+    pointer-events: none;
+}
+.upInner:before {
+    top: calc(50% - 4px);
+    left: calc(50% - 7px);
+    border-style: solid;
+    border-width: 0 7px 7px 7px;
+    border-color: transparent transparent black transparent;
+}
+.downInner:before {
+    top: calc(50% - 3px);
+    left: calc(50% - 7px);
+    border-style: solid;
+    border-width: 7px 7px 0 7px;
+    border-color: black transparent transparent transparent;
+}

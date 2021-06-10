@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+
+    <constant name="struts.devMode" value="true" />
+    <constant name="struts.actionProxyFactory" value="org.example.ots.util.MyActionProxyFactory" />
+
+    <bean class="org.example.ots.bean.ProgrammingLanguages" scope="session" />
+
+    <package name="struts2playground" extends="struts-default">
+        <interceptors>
+            <interceptor name="createSession" class="org.example.ots.util.NewSessionInterceptor" />
+        </interceptors>
+        <action name="index" class="org.example.ots.action.IndexAction" method="execute">
+            <result name="success">/index.jsp</result>
+        </action>
+        <action name="newSession" class="org.example.ots.action.IndexAction" method="returnSuccess">
+            <interceptor-ref name="createSession" />
+            <result name="success">/index.jsp</result>
+        </action>
+        <action name="clear" class="org.example.ots.action.IndexAction" method="clear">
+            <result name="success">/index.jsp</result>
+        </action>
+        <action name="otsDemo" class="org.example.ots.action.TransferAction" method="execute">
+            <result name="success">/ots-demo.jsp</result>
+        </action>
+        <action name="otsSave" class="org.example.ots.action.TransferAction" method="save">
+            <result name="success" type="redirectAction">otsDemo</result>
+        </action>
+    </package>
+
+</struts>
