@@ -1,8 +1,9 @@
 package org.example.ots.util;
 
 import com.opensymphony.xwork2.inject.Scope;
+import org.apache.struts2.ServletActionContext;
 
-import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.concurrent.Callable;
 
@@ -15,11 +16,36 @@ public class MyScopeStrategy implements Scope.Strategy {
 
     private static final MyScopeStrategy INSTANCE = new MyScopeStrategy();
 
-    private static final ThreadLocal<WithAttributes> REQUEST_THREAD_LOCAL = new InheritableThreadLocal<>();
-    private static final ThreadLocal<WithAttributes> SESSION_THREAD_LOCAL = new InheritableThreadLocal<>();
+    public static Scope.Strategy getInstance() {
+        return INSTANCE;
+    }
 
-    public static void setCurrentSession(HttpSession session) {
-        SESSION_THREAD_LOCAL.set(new WithAttributes() {
+    @Override
+    public <T> T findInRequest(Class<T> type, String name, Callable<? extends T> factory) throws Exception {
+        return findAttribute(type, name, factory, asWithAttributes(ServletActionContext.getRequest()));
+    }
+
+    @Override
+    public <T> T findInSession(Class<T> type, String name, Callable<? extends T> factory) throws Exception {
+        return findAttribute(type, name, factory, asWithAttributes(ServletActionContext.getRequest().getSession()));
+    }
+
+    private WithAttributes asWithAttributes(HttpServletRequest request) {
+        return new WithAttributes() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T> T getAttribute(String name) {
+                return (T) request.getAttribute(name);
+            }
+            @Override
+            public void setAttribute(String name, Object value) {
+                request.setAttribute(name, value);
+            }
+        };
+    }
+
+    private WithAttributes asWithAttributes(HttpSession session) {
+        return new WithAttributes() {
             @Override
             @SuppressWarnings("unchecked")
             public <T> T getAttribute(String name) {
@@ -29,35 +55,7 @@ public class MyScopeStrategy implements Scope.Strategy {
             public void setAttribute(String name, Object value) {
                 session.setAttribute(name, value);
             }
-        });
-    }
-
-    public static void setCurrentRequest(ServletRequest servletRequest) {
-        REQUEST_THREAD_LOCAL.set(new WithAttributes() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public <T> T getAttribute(String name) {
-                return (T) servletRequest.getAttribute(name);
-            }
-            @Override
-            public void setAttribute(String name, Object value) {
-                servletRequest.setAttribute(name, value);
-            }
-        });
-    }
-
-    public static Scope.Strategy getInstance() {
-        return INSTANCE;
-    }
-
-    @Override
-    public <T> T findInRequest(Class<T> type, String name, Callable<? extends T> factory) throws Exception {
-        return findAttribute(type, name, factory, REQUEST_THREAD_LOCAL.get());
-    }
-
-    @Override
-    public <T> T findInSession(Class<T> type, String name, Callable<? extends T> factory) throws Exception {
-        return findAttribute(type, name, factory, SESSION_THREAD_LOCAL.get());
+        };
     }
 
     private <T> T findAttribute(Class<T> type,
